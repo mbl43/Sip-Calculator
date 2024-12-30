@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <title>SIP Calculator</title>
+    <style>
+      html {
+        font-size: 16px;
+      }
+      body {
+        font-size: 1.25rem;
+      }
+
+      input::placeholder {
+        font-size: 1.2rem;
+        text-align: center;
+        padding: 18px;
+      }
+      input {
+        text-align: center;
+      }
+
+      button:hover {
+        background: rgb(140, 255, 140);
+      }
+    </style>
+  </head>
+  <body class="bg-gray-100">
+    <section class="flex justify-center items-center w-full h-screen p-4 flex-col sm:flex-row">
+      <form
+        action=""
+        id="myForm"
+        class="flex flex-col gap-y-6 bg-white p-8 rounded-lg shadow-lg w-full sm:w-[400px]"
+      >
+        <label for="investment-amount" class="text-lg font-semibold">
+          Monthly Investment Amount (₹) :
+          <input
+            type="number"
+            name="investment-amount"
+            id="investment-amount"
+            placeholder="5000"
+            class="p-4 border-2 rounded-lg border-gray-300 focus:outline-none focus:border-blue-500 w-full min-w-[250px]"
+            required
+          />
+        </label>
+
+        <label for="annual-returns" class="text-lg font-semibold">
+          Expected Annual Returns (%) :
+          <input
+            type="number"
+            name="annual-returns"
+            id="annual-returns"
+            placeholder="12%"
+            class="p-4 border-2 rounded-lg border-gray-300 focus:outline-none focus:border-blue-500 w-full min-w-[250px]"
+            required
+          />
+        </label>
+
+        <label for="investment-period" class="text-lg font-semibold">
+          Investment Period (Years) :
+          <input
+            type="number"
+            name="investment-period"
+            id="investment-period"
+            placeholder="7 Years"
+            class="p-4 border-2 rounded-lg border-gray-300 focus:outline-none focus:border-blue-500 w-full min-w-[250px]"
+            required
+          />
+        </label>
+
+        <button
+          type="button"
+          id="btn"
+          class="bg-green-500 text-white border-2 rounded-lg border-green-500 font-bold hover:bg-green-600 w-full py-3 mt-4 transition-all"
+        >
+          Calculate
+        </button>
+        <button
+          type="button"
+          id="resetbtn"
+          class="bg-green-500 text-white border-2 rounded-lg border-green-500 font-bold hover:bg-green-600 w-full py-3 mt-0 transition-all"
+        >
+          Reset
+        </button>
+      </form>
+      <div
+        class="sm:max-w-[350px] w-full m-10 flex items-center justify-center"
+        id="result"
+      >
+        <table
+          class="border border-gray-300 rounded-lg overflow-hidden shadow-lg w-full bg-white"
+        >
+          <thead>
+            <tr class="bg-gray-100">
+              <th
+                colspan="2"
+                class="text-center py-2 text-lg font-semibold text-gray-700"
+              >
+                Investment Details
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="border-b">
+              <td class="px-4 py-2 font-medium text-gray-600">
+                Expected Amount ₹:
+              </td>
+              <td class="px-4 py-2 text-black" id="futurevalue">₹0</td>
+            </tr>
+            <tr class="border-b">
+              <td class="px-4 py-2 font-medium text-gray-600">
+                Amount Invested ₹:
+              </td>
+              <td class="px-4 py-2 text-gray-500" id="currentvalue">₹0</td>
+            </tr>
+            <tr>
+              <td class="px-4 py-2 font-medium text-gray-600">
+                Wealth Gain ₹:
+              </td>
+              <td class="px-4 py-2 text-green-500" id="wealth">₹0</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <script>
+      document.getElementById("btn").addEventListener("click", calc);
+      document.getElementById("resetbtn").addEventListener("click", reset);
+      function calc() {
+        const investment_amt = parseFloat(
+          document.getElementById("investment-amount").value
+        );
+        const annual_returns = parseFloat(
+          document.getElementById("annual-returns").value
+        );
+        const investment_period = parseFloat(
+          document.getElementById("investment-period").value
+        );
+        if (
+          isNaN(investment_amt) ||
+          isNaN(annual_returns) ||
+          isNaN(investment_period)
+        ) {
+          alert("fill all the fields");
+          return;
+        }
+        if (
+          investment_amt <= 0 ||
+          annual_returns <= 0 ||
+          investment_period <= 0
+        ) {
+          alert("Don't enter negative value");
+          return;
+        }
+        const n = 12; // monthly compounding
+        const r = annual_returns / 100; // annual rate
+        const p = investment_period * 12; // total time period in months
+
+        const monthly_int_rate = r / n; //monthly interest rate
+        const total_investment = investment_amt * p; // total investment
+        console.log("total investment", total_investment);
+
+        // result
+        const total_return =
+          investment_amt *
+          (((Math.pow(1 + monthly_int_rate, p) - 1) / monthly_int_rate) *
+            (1 + monthly_int_rate));
+
+        console.log("total final return", total_return);
+        const wealth = total_return - total_investment;
+        display(total_return, total_investment, wealth);
+      }
+      function display(total_return, total_investment, wealth) {
+        document.getElementById("futurevalue").innerHTML =
+          "₹" + total_return.toFixed(2);
+        document.getElementById("currentvalue").innerHTML =
+          "₹" + total_investment.toFixed(2);
+        document.getElementById("wealth").innerHTML = "₹" + wealth.toFixed(2);
+      }
+      function reset() {
+        document.getElementById("myForm").reset()
+        document.getElementById("futurevalue").innerHTML ="₹0";
+
+        document.getElementById("currentvalue").innerHTML = "₹0";
+
+        document.getElementById("wealth").innerHTML = "₹0";
+      }
+    </script>
+  </body>
+</html>
